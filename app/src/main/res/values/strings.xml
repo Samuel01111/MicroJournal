@@ -46,4 +46,7 @@
     <string name="audio_recording_was_too_short">Audio recording was too short</string>
     <string name="clear_selections">Clear Selections</string>
     <string name="create_entry">Create \'%s\'</string>
+    <string name="playing">playing</string>
+    <string name="paused">paused</string>
+    <string name="stopped">stopped</string>
 </resources>

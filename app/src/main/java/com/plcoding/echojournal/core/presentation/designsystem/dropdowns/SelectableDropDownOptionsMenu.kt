@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -34,7 +32,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.plcoding.echojournal.R
-import com.plcoding.echojournal.core.presentation.designsystem.dropdowns.Selectable.Companion.asUnselectedItems
 import com.plcoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
 
 @Composable
@@ -42,10 +39,10 @@ fun <T> SelectableDropDownOptionsMenu(
     modifier: Modifier = Modifier,
     items: List<Selectable<T>>,
     itemDisplayText: (T) -> String,
-    key: (Selectable<T>) -> Any,
+    key: (T) -> Any,
     onDismiss: () -> Unit,
     onItemClick: (Selectable<T>) -> Unit,
-    leandingIcon: (@Composable () -> Unit)? = null,
+    leadingIcon: (@Composable (T) -> Unit)? = null,
     dropDownOffset: IntOffset = IntOffset.Zero,
     maxDropDownHeight: Dp = Dp.Unspecified,
     dropDownExtras: SelectableOptionExtras? = null
@@ -75,7 +72,7 @@ fun <T> SelectableDropDownOptionsMenu(
             ) {
                 items(
                     items = items,
-                    key = key
+                    key = { key(it.item) },
                 ) { selectable ->
                     Row(
                         modifier =
@@ -95,7 +92,7 @@ fun <T> SelectableDropDownOptionsMenu(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        leandingIcon?.invoke()
+                        leadingIcon?.invoke(selectable.item)
                         Text(
                             modifier = Modifier.weight(1f),
                             text = itemDisplayText(selectable.item)
@@ -139,7 +136,6 @@ fun <T> SelectableDropDownOptionsMenu(
             }
         }
     }
-
 }
 
 @Preview
@@ -165,7 +161,7 @@ private fun SelectableDropDownOptionsMenuPreview() {
             itemDisplayText = { it },
             onDismiss = {},
             onItemClick = {},
-            leandingIcon = {
+            leadingIcon = {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.hashtag),
                     contentDescription = null
