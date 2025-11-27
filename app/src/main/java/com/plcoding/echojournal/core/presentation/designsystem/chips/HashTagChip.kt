@@ -24,7 +24,7 @@ import com.plcoding.echojournal.core.presentation.designsystem.theme.Gray6
 fun HashTagChip(
     modifier: Modifier = Modifier,
     text: String,
-    trailingIcon: (@Composable () -> Unit)?,
+    trailingIcon: (@Composable () -> Unit)? = null,
 ) {
     Surface(
         modifier = modifier,

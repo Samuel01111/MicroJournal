@@ -25,6 +25,7 @@ import com.plcoding.echojournal.core.presentation.designsystem.theme.MoodPrimary
 import com.plcoding.echojournal.core.presentation.util.formatMMSS
 import com.plcoding.echojournal.echos.presentation.models.MoodUi
 import com.plcoding.echojournal.echos.presentation.models.PlaybackState
+import com.plcoding.echojournal.echos.presentation.models.TrackSizeInfo
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -39,6 +40,7 @@ fun EchoMoodPlayer(
     powerRatios: List<Float>,
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
+    onTrackSizeAvailable: (TrackSizeInfo) -> Unit,
     modifier: Modifier = Modifier,
     amplitudeBarWidth: Dp = 5.dp,
     amplitudeBarSpacing: Dp = 4.dp
@@ -125,7 +127,8 @@ private fun EchoMoodPlayerPreview() {
             powerRatios = rations,
             onPauseClick = {},
             onPlayClick = {},
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            onTrackSizeAvailable = {}
         )
     }
 }
