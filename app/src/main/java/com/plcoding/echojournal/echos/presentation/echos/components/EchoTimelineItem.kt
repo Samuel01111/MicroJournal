@@ -1,4 +1,4 @@
-package com.plcoding.echojournal.echos.presentation.components
+package com.plcoding.echojournal.echos.presentation.echos.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -15,15 +15,14 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.plcoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
 import com.plcoding.echojournal.echos.presentation.models.EchoUi
-import com.plcoding.echojournal.echos.presentation.models.RelativePosition
-import com.plcoding.echojournal.echos.presentation.models.TrackSizeInfo
+import com.plcoding.echojournal.echos.presentation.echos.models.RelativePosition
+import com.plcoding.echojournal.echos.presentation.echos.models.TrackSizeInfo
 import com.plcoding.echojournal.echos.presentation.preview.PreviewModels
 
 private val noVerticalLineAboveIconModifier = Modifier.padding(top = 16.dp)

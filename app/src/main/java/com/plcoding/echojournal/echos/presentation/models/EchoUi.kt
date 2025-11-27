@@ -1,5 +1,6 @@
 package com.plcoding.echojournal.echos.presentation.models
 
+import com.plcoding.echojournal.echos.presentation.echos.models.PlaybackState
 import com.plcoding.echojournal.echos.presentation.util.toReadableTime
 import java.time.Instant
 import kotlin.time.Duration

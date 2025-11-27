@@ -24,8 +24,8 @@ import com.plcoding.echojournal.core.presentation.designsystem.theme.MoodPrimary
 import com.plcoding.echojournal.core.presentation.designsystem.theme.MoodPrimary80
 import com.plcoding.echojournal.core.presentation.util.formatMMSS
 import com.plcoding.echojournal.echos.presentation.models.MoodUi
-import com.plcoding.echojournal.echos.presentation.models.PlaybackState
-import com.plcoding.echojournal.echos.presentation.models.TrackSizeInfo
+import com.plcoding.echojournal.echos.presentation.echos.models.PlaybackState
+import com.plcoding.echojournal.echos.presentation.echos.models.TrackSizeInfo
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

@@ -16,7 +16,7 @@ import com.plcoding.echojournal.core.presentation.designsystem.theme.EchoJournal
 import com.plcoding.echojournal.core.presentation.designsystem.theme.Pause
 import com.plcoding.echojournal.core.presentation.util.defaultShadow
 import com.plcoding.echojournal.echos.presentation.models.MoodUi
-import com.plcoding.echojournal.echos.presentation.models.PlaybackState
+import com.plcoding.echojournal.echos.presentation.echos.models.PlaybackState
 
 @Composable
 fun EchoPlaybackButton(

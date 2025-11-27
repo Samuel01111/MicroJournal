@@ -1,4 +1,4 @@
-package com.plcoding.echojournal.echos.presentation.components
+package com.plcoding.echojournal.echos.presentation.echos.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable

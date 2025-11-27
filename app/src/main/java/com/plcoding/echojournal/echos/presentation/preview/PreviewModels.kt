@@ -2,7 +2,7 @@ package com.plcoding.echojournal.echos.presentation.preview
 
 import com.plcoding.echojournal.echos.presentation.models.EchoUi
 import com.plcoding.echojournal.echos.presentation.models.MoodUi
-import com.plcoding.echojournal.echos.presentation.models.PlaybackState
+import com.plcoding.echojournal.echos.presentation.echos.models.PlaybackState
 import java.time.Instant
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds

@@ -1,4 +1,4 @@
-package com.plcoding.echojournal.echos.presentation.models
+package com.plcoding.echojournal.echos.presentation.echos.models
 
 enum class RelativePosition {
     FIRST,

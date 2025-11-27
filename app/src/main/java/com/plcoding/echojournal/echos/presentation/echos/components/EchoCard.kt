@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalLayoutApi::class)
 
-package com.plcoding.echojournal.echos.presentation.components
+package com.plcoding.echojournal.echos.presentation.echos.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,8 +21,9 @@ import androidx.compose.ui.unit.dp
 import com.plcoding.echojournal.core.presentation.designsystem.chips.HashTagChip
 import com.plcoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
 import com.plcoding.echojournal.core.presentation.util.defaultShadow
+import com.plcoding.echojournal.echos.presentation.components.EchoMoodPlayer
 import com.plcoding.echojournal.echos.presentation.models.EchoUi
-import com.plcoding.echojournal.echos.presentation.models.TrackSizeInfo
+import com.plcoding.echojournal.echos.presentation.echos.models.TrackSizeInfo
 import com.plcoding.echojournal.echos.presentation.preview.PreviewModels
 
 @Composable
