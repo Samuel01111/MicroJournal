@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.navigation.compose.rememberNavController
+import com.plcoding.echojournal.app.navigation.NavigationRoot
 import com.plcoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
 import com.plcoding.echojournal.echos.data.recording.AndroidVoiceRecorder
 import com.plcoding.echojournal.echos.presentation.echos.EchosRoot
@@ -23,7 +25,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EchoJournalTheme {
-                EchosRoot()
+                NavigationRoot(
+                    navController = rememberNavController()
+                )
             }
         }
     }

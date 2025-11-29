@@ -45,6 +45,7 @@ import com.plcoding.echojournal.core.presentation.designsystem.theme.EchoJournal
 import com.plcoding.echojournal.core.presentation.designsystem.theme.Microphone
 import com.plcoding.echojournal.core.presentation.designsystem.theme.Pause
 import com.plcoding.echojournal.core.presentation.designsystem.theme.buttonGradient
+import com.plcoding.echojournal.core.presentation.designsystem.theme.buttonGradientPressed
 import com.plcoding.echojournal.core.presentation.designsystem.theme.primary90
 import com.plcoding.echojournal.core.presentation.designsystem.theme.primary95
 
@@ -146,53 +147,26 @@ fun SheetContent(
                 )
             }
 
-            val interactionSource = remember {
-                MutableInteractionSource()
-            }
-            val isPressed by interactionSource.collectIsPressedAsState()
-            Box(
-               modifier = Modifier
-                   .size(primaryBubbleSize)
-                   .background(
-                       color = if(isRecording) {
-                           MaterialTheme.colorScheme.primary95
-                       } else Color.Transparent,
-                       shape = CircleShape
-                   )
-                   .padding(10.dp)
-                   .background(
-                       color = if(isRecording) {
-                           MaterialTheme.colorScheme.primary90
-                       } else Color.Transparent,
-                       shape = CircleShape
-                   )
-                   .padding(16.dp)
-                   .background(
-                       brush = MaterialTheme.colorScheme.buttonGradient,
-                       shape = CircleShape
-                   )
-                   .clip(CircleShape)
-                   .clickable(
-                       interactionSource = interactionSource,
-                       indication = LocalIndication.current,
-                       onClick = if(isPressed) {
-                           onCompleteRecording
-                       } else onResumeClick
-                   ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if(isRecording) {
-                        Icons.Default.Check
-                    } else Icons.Filled.Microphone,
-                    contentDescription = if(isRecording) {
-                        stringResource(R.string.finish_recording)
-                    } else {
-                        stringResource(R.string.resume_recording)
-                    },
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
+            EchoBubbleFloatingActionButton(
+                showBubble = isRecording,
+                onClick = if (isRecording) {
+                    onCompleteRecording
+                } else onResumeClick,
+                icon = {
+                    Icon(
+                        imageVector = if(isRecording) {
+                            Icons.Default.Check
+                        } else Icons.Filled.Microphone,
+                        contentDescription = if(isRecording) {
+                            stringResource(R.string.finish_recording)
+                        } else {
+                            stringResource(R.string.resume_recording)
+                        },
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                },
+                primaryButtonSize = 72.dp
+            )
 
             FilledIconButton(
                 onClick = if (isRecording) {

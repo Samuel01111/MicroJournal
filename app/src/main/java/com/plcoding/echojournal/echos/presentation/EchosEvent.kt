@@ -1,7 +1,9 @@
 package com.plcoding.echojournal.echos.presentation
 
+import com.plcoding.echojournal.echos.domain.recording.RecordingDetails
+
 interface EchosEvent {
     data object RequestAudioPermission: EchosEvent
     data object RecordingTooShort: EchosEvent
-    data object OnDoneRecording: EchosEvent
+    data class OnDoneRecording(val recordingDetails: RecordingDetails): EchosEvent
 }
