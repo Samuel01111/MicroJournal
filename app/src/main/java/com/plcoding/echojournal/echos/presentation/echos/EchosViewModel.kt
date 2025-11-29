@@ -70,6 +70,10 @@ class EchosViewModel : ViewModel() {
             is EchosAction.OnFilterByTopicClick -> {
                 toggleTopicFilter(action.topic)
             }
+
+            EchosAction.OnPauseEchoClick -> {}
+            is EchosAction.OnPlayEchoClick -> {}
+            is EchosAction.OnTrackSizeAvailable -> {}
         }
     }
 
