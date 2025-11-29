@@ -91,9 +91,14 @@ val ColorScheme.buttonGradientPressed: Brush
         )
     )
 
-
 val ColorScheme.primary90: Color
     get() = Primary90
 
 val ColorScheme.primary95: Color
     get() = Primary90
+
+val ColorScheme.secondary95: Color
+    get() = Secondary95
+
+val ColorScheme.secondary70: Color
+    get() = Secondary70
