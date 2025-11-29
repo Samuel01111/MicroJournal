@@ -2,6 +2,7 @@ package com.plcoding.echojournal.echos.presentation.echos
 
 import EchosTopBar
 import android.Manifest
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,21 +17,28 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.plcoding.echojournal.R
 import com.plcoding.echojournal.core.presentation.designsystem.theme.EchoJournalTheme
 import com.plcoding.echojournal.core.presentation.designsystem.theme.bgGradient
+import com.plcoding.echojournal.core.presentation.util.IsAppInForeground
 import com.plcoding.echojournal.core.presentation.util.ObserveAsEvents
 import com.plcoding.echojournal.echos.presentation.EchosEvent
 import com.plcoding.echojournal.echos.presentation.echos.components.EchoFilterRow
 import com.plcoding.echojournal.echos.presentation.echos.components.EchoList
 import com.plcoding.echojournal.echos.presentation.echos.components.EchoRecordFloatingActionButton
+import com.plcoding.echojournal.echos.presentation.echos.components.EchoRecordingSheet
 import com.plcoding.echojournal.echos.presentation.echos.components.EchosEmptyBackground
 import com.plcoding.echojournal.echos.presentation.echos.models.AudioCaptureMethod
+import com.plcoding.echojournal.echos.presentation.echos.models.RecordingState
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @Composable
 fun EchosRoot(
@@ -45,11 +53,29 @@ fun EchosRoot(
             viewModel.onAction(EchosAction.OnAudioPermissionGranted)
         }
     }
+    val context = LocalContext.current
     ObserveAsEvents(viewModel.events) { event ->
         when(event) {
             is EchosEvent.RequestAudioPermission -> {
                 permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             }
+            is EchosEvent.RecordingTooShort -> {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.audio_recording_was_too_short),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            is EchosEvent.OnDoneRecording -> {
+                Timber.d("Recording successful!")
+            }
+        }
+    }
+
+    val isAppInForeground by IsAppInForeground()
+    LaunchedEffect(isAppInForeground, state.recordingState) {
+        if(state.recordingState == RecordingState.NORMAL_CAPTURE && !isAppInForeground) {
+            viewModel.onAction(EchosAction.OnPauseRecordingClick)
         }
     }
 
@@ -120,7 +146,7 @@ fun EchosScreen(
                             onAction(EchosAction.OnPlayEchoClick(it))
                         },
                         onPauseClick = {
-                            onAction(EchosAction.OnPauseEchoClick)
+                            onAction(EchosAction.OnPauseRecordingClick)
                         },
                         onTrackSizeAvailable = { trackSize ->
                             onAction(EchosAction.OnTrackSizeAvailable(trackSize))
@@ -128,6 +154,17 @@ fun EchosScreen(
                     )
                 }
             }
+        }
+
+        if(state.recordingState in listOf(RecordingState.NORMAL_CAPTURE, RecordingState.PAUSED)) {
+            EchoRecordingSheet(
+                formattedRecordDuration = state.formattedRecordDuration,
+                isRecording = state.recordingState == RecordingState.NORMAL_CAPTURE,
+                onDismiss = { onAction(EchosAction.OnCancelRecording) },
+                onPauseClick = { onAction(EchosAction.OnPauseRecordingClick) },
+                onResumeClick = { onAction(EchosAction.OnResumeRecordingClick) },
+                onCompleteRecording = { onAction(EchosAction.OnCompleteRecording) }
+            )
         }
     }
 }

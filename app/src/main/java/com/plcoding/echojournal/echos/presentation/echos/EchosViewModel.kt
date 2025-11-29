@@ -10,22 +10,31 @@ import com.plcoding.echojournal.echos.presentation.EchosEvent
 import com.plcoding.echojournal.echos.presentation.echos.models.AudioCaptureMethod
 import com.plcoding.echojournal.echos.presentation.echos.models.EchoFilterChip
 import com.plcoding.echojournal.echos.presentation.echos.models.MoodChipContent
+import com.plcoding.echojournal.echos.presentation.echos.models.RecordingState
 import com.plcoding.echojournal.echos.presentation.models.MoodUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.time.Duration.Companion.seconds
 
 class EchosViewModel(
     private val voiceRecorder: VoiceRecorder
 ) : ViewModel() {
+
+    companion object {
+        private val MIN_RECORD_DURATION = 1.5.seconds
+    }
 
     private var hasLoadedInitialData = false
 
@@ -92,18 +101,86 @@ class EchosViewModel(
             is EchosAction.OnFilterByTopicClick -> {
                 toggleTopicFilter(action.topic)
             }
-
-            EchosAction.OnPauseEchoClick -> {}
             is EchosAction.OnPlayEchoClick -> {}
             is EchosAction.OnTrackSizeAvailable -> {}
             EchosAction.OnAudioPermissionGranted -> {
-                Timber.d("Recording started....")
+                startRecording(captureMethod = AudioCaptureMethod.STANDARD)
             }
+            EchosAction.OnPauseRecordingClick -> pauseRecording()
+            EchosAction.OnCancelRecording -> cancelRecording()
+            EchosAction.OnCompleteRecording -> stopRecording()
+            EchosAction.OnPauseAudioClick -> {
+
+            }
+            EchosAction.OnResumeRecordingClick -> resumeRecording()
         }
     }
 
     private fun requestAudioPermission() = viewModelScope.launch {
         eventChannel.send(EchosEvent.RequestAudioPermission)
+    }
+
+    private fun pauseRecording() {
+        voiceRecorder.pause()
+        _state.update { it.copy(
+            recordingState = RecordingState.PAUSED
+        ) }
+    }
+
+    private fun resumeRecording() {
+        voiceRecorder.resume()
+        _state.update { it.copy(
+            recordingState = RecordingState.NORMAL_CAPTURE
+        ) }
+    }
+
+    private fun cancelRecording() {
+        _state.update { it.copy(
+            recordingState = RecordingState.NOT_RECORDING,
+            currentCaptureMethod = null
+        ) }
+        voiceRecorder.cancel()
+    }
+
+    private fun stopRecording() {
+        voiceRecorder.stop()
+        _state.update { it: EchosState ->
+            it.copy(
+                recordingState = RecordingState.NOT_RECORDING
+            )
+        }
+
+        val recordingDetails = voiceRecorder.recordingDetails.value
+        viewModelScope.launch {
+            if (recordingDetails.duration < MIN_RECORD_DURATION) {
+                eventChannel.send(EchosEvent.RecordingTooShort)
+            } else {
+                eventChannel.send(EchosEvent.OnDoneRecording)
+            }
+        }
+    }
+
+    private fun startRecording(captureMethod: AudioCaptureMethod) {
+        _state.update { it.copy(
+            recordingState = when(captureMethod) {
+                AudioCaptureMethod.STANDARD -> RecordingState.NORMAL_CAPTURE
+                AudioCaptureMethod.QUICK -> RecordingState.QUICK_CAPTURE
+            }
+        ) }
+        voiceRecorder.start()
+
+        if(captureMethod == AudioCaptureMethod.STANDARD) {
+            voiceRecorder
+                .recordingDetails
+                .distinctUntilChangedBy { it.duration }
+                .map { it.duration }
+                .onEach { duration ->
+                    _state.update { it.copy(
+                        recordingElapsedDuration = duration
+                    ) }
+                }
+                .launchIn(viewModelScope)
+        }
     }
 
     private fun toggleMoodFilter(moodUi: MoodUi) {
