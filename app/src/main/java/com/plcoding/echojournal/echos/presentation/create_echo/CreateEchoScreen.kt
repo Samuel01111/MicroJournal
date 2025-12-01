@@ -22,6 +22,8 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
@@ -31,6 +33,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -65,21 +68,31 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateEchoRoot(
-    viewModel: CreateEchoViewModel = koinViewModel()
+    viewModel: CreateEchoViewModel = koinViewModel(),
+    onConfirmLeave: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     CreateEchoScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onConfirmLeave = onConfirmLeave
     )
 }
 
 @Composable
 fun CreateEchoScreen(
     state: CreateEchoState,
+    onConfirmLeave: () -> Unit,
     onAction: (CreateEchoAction) -> Unit,
 ) {
+
+    BackHandler(
+        enabled = !state.showConfirmLeaveDialog
+    ) {
+        onAction(CreateEchoAction.OnGoBack)
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
@@ -290,6 +303,45 @@ fun CreateEchoScreen(
                 }
             )
         }
+
+        if(state.showConfirmLeaveDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    onAction(CreateEchoAction.OnDismissConfirmLeaveDialog)
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = onConfirmLeave
+                    ) {
+                        Text(
+                            text = stringResource(R.string.discard),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            onAction(CreateEchoAction.OnDismissConfirmLeaveDialog)
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.cancel)
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        text = stringResource(R.string.discord_recording)
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.this_cannot_be_undone)
+                    )
+                }
+            )
+        }
     }
 }
 
@@ -301,7 +353,8 @@ private fun Preview() {
             state = CreateEchoState(
                 mood = MoodUi.EXCITED
             ),
-            onAction = {}
+            onAction = {},
+            onConfirmLeave = {}
         )
     }
 }
