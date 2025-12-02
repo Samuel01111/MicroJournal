@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.plcoding.echojournal.app.navigation.NavigationRoute
 import com.plcoding.echojournal.core.presentation.designsystem.dropdowns.Selectable.Companion.asUnselectedItems
-import com.plcoding.echojournal.echos.data.recording.InternalRecordingStorage
 import com.plcoding.echojournal.echos.domain.audio.AudioPlayer
 import com.plcoding.echojournal.echos.domain.recording.RecordingStorage
 import com.plcoding.echojournal.echos.presentation.echos.models.PlaybackState
@@ -33,7 +32,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.debounce
 import kotlin.time.Duration
 
 class CreateEchoViewModel(
@@ -50,8 +48,15 @@ class CreateEchoViewModel(
     private val eventChannel = Channel<CreateEchoEvent>()
     val events = eventChannel.receiveAsFlow()
 
+    private val restoredTopics = savedStateHandle.get<String>("topics")?.split(",")
     private val _state = MutableStateFlow(CreateEchoState(
-        playbackTotalDuration = recordingDetails.duration
+        playbackTotalDuration = recordingDetails.duration,
+        titleText = savedStateHandle["titleText"] ?: "",
+        noteText = savedStateHandle["noteText"] ?: "",
+        topics = restoredTopics ?: emptyList(),
+        mood = savedStateHandle.get<String>("mood")?.let { MoodUi.valueOf(it) },
+        showMoodSelector = savedStateHandle.get<String>("mood") == null,
+        canSaveEcho = savedStateHandle.get<Boolean>("canSaveEcho") == true
     ))
     val state = _state
         .onStart {
@@ -59,6 +64,13 @@ class CreateEchoViewModel(
                 observeAddTopicText()
                 hasLoadedInitialData = true
             }
+        }
+        .onEach { state ->
+            savedStateHandle["titleText"] = state.titleText
+            savedStateHandle["noteText"] = state.noteText
+            savedStateHandle["topics"] = state.topics.joinToString(",")
+            savedStateHandle["mood"] = state.mood?.name
+            savedStateHandle["canSaveEcho"] = state.canSaveEcho
         }
         .stateIn(
             scope = viewModelScope,
@@ -75,7 +87,7 @@ class CreateEchoViewModel(
             CreateEchoAction.OnDismissMoodSelector -> onDismissMoodSelector()
             CreateEchoAction.OnDismissTopicSuggestions -> onDismissTopicSuggestions()
             is CreateEchoAction.OnMoodClick -> onMoodClick(action.moodUi)
-            is CreateEchoAction.OnNoteTextChange -> {}
+            is CreateEchoAction.OnNoteTextChange -> onNoteTextChange(action.text)
             CreateEchoAction.OnPauseAudioClick -> audioPlayer.pause()
             CreateEchoAction.OnPlayAudioClick -> onPlayAudioClick()
             is CreateEchoAction.OnRemoveTopicClick -> onRemoveTopicClick(action.topic)
@@ -89,6 +101,13 @@ class CreateEchoViewModel(
             CreateEchoAction.OnNavigateBackClick,
             CreateEchoAction.OnGoBack -> onShowConfirmLeaveDialog()
         }
+    }
+
+    private fun onNoteTextChange(text: String) {
+        _state.update { it.copy(
+            noteText = text,
+            canSaveEcho = text.isNotBlank() && it.mood != null
+        ) }
     }
 
     private fun onPlayAudioClick() {
