@@ -1,4 +1,4 @@
-package com.plcoding.echojournal.echos.presentation
+package com.plcoding.echojournal.echos.presentation.echos
 
 import com.plcoding.echojournal.echos.domain.recording.RecordingDetails
 

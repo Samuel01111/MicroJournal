@@ -6,7 +6,7 @@ import com.plcoding.echojournal.R
 import com.plcoding.echojournal.core.presentation.designsystem.dropdowns.Selectable
 import com.plcoding.echojournal.core.presentation.util.UiText
 import com.plcoding.echojournal.echos.domain.recording.VoiceRecorder
-import com.plcoding.echojournal.echos.presentation.EchosEvent
+import com.plcoding.echojournal.echos.presentation.echos.EchosEvent
 import com.plcoding.echojournal.echos.presentation.echos.models.AudioCaptureMethod
 import com.plcoding.echojournal.echos.presentation.echos.models.EchoFilterChip
 import com.plcoding.echojournal.echos.presentation.echos.models.MoodChipContent
