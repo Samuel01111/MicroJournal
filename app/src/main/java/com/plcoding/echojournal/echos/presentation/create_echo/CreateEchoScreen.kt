@@ -87,6 +87,9 @@ fun CreateEchoRoot(
                 ).show()
                 onConfirmLeave()
             }
+            CreateEchoEvent.EchoSuccessfullySaved -> {
+                onConfirmLeave()
+            }
         }
     }
 
