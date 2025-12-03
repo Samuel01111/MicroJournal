@@ -25,7 +25,30 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.plcoding.CREATE_ECHO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="https"
+                    android:host="echojournal.com"
+                    android:path="create_echo" />
+            </intent-filter>
+
+
         </activity>
+
+        <receiver android:name=".app.widget.RecordEchoWidgetReceiver"
+            android:label="@string/create_new_entry_widget"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/record_echo_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
