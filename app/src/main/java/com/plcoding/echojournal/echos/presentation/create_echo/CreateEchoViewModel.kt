@@ -13,6 +13,7 @@ import com.plcoding.echojournal.echos.domain.echo.Echo
 import com.plcoding.echojournal.echos.domain.echo.EchoDataSource
 import com.plcoding.echojournal.echos.domain.echo.Mood
 import com.plcoding.echojournal.echos.domain.recording.RecordingStorage
+import com.plcoding.echojournal.echos.domain.settings.SettingsPreferences
 import com.plcoding.echojournal.echos.presentation.echos.models.PlaybackState
 import com.plcoding.echojournal.echos.presentation.echos.models.TrackSizeInfo
 import com.plcoding.echojournal.echos.presentation.models.MoodUi
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -42,7 +44,8 @@ class CreateEchoViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val recordingStorage: RecordingStorage,
     private val audioPlayer: AudioPlayer,
-    private val echoDataSource: EchoDataSource
+    private val echoDataSource: EchoDataSource,
+    private val settingsPreferences: SettingsPreferences
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -53,7 +56,7 @@ class CreateEchoViewModel(
     private val eventChannel = Channel<CreateEchoEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    private val restoredTopics = savedStateHandle.get<String>("topics")?.split(",")
+    private val restoredTopics = savedStateHandle.get<String>("topic")?.split(",")
     private val _state = MutableStateFlow(CreateEchoState(
         playbackTotalDuration = recordingDetails.duration,
         titleText = savedStateHandle["titleText"] ?: "",
@@ -67,13 +70,14 @@ class CreateEchoViewModel(
         .onStart {
             if (!hasLoadedInitialData) {
                 observeAddTopicText()
+                fetchDefaultSettings()
                 hasLoadedInitialData = true
             }
         }
         .onEach { state ->
             savedStateHandle["titleText"] = state.titleText
             savedStateHandle["noteText"] = state.noteText
-            savedStateHandle["topics"] = state.topics.joinToString(",")
+            savedStateHandle["topic"] = state.topics.joinToString(",")
             savedStateHandle["mood"] = state.mood?.name
             savedStateHandle["canSaveEcho"] = state.canSaveEcho
         }
@@ -82,6 +86,28 @@ class CreateEchoViewModel(
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = CreateEchoState()
         )
+
+    private fun fetchDefaultSettings() {
+        settingsPreferences
+            .observeDefaultMood()
+            .take(1)
+            .onEach { defaultMood ->
+                _state.update { it.copy(
+                    selectedMood = MoodUi.valueOf(defaultMood.name)
+                ) }
+            }
+            .launchIn(viewModelScope)
+
+        settingsPreferences
+            .observeDefaultTopics()
+            .take(1)
+            .onEach { defaultTopics ->
+                _state.update { it.copy(
+                    topics = defaultTopics
+                ) }
+            }
+            .launchIn(viewModelScope)
+    }
 
     private var durationJob: Job? = null
 
